@@ -13,7 +13,6 @@ function App() {
                     element={
                         <div className="App">
                             <Claim />
-                            
                         </div>
                     }
                 ></Route>
