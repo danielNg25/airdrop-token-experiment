@@ -1,0 +1,92 @@
+.App {
+    text-align: center;
+}
+
+.App-logo {
+    height: 40vmin;
+    pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .App-logo {
+        animation: App-logo-spin infinite 20s linear;
+    }
+}
+
+.App-header {
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
+}
+
+.App-link {
+    color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.Header {
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #444;
+    z-index: 999;
+    color: white;
+    position: sticky;
+    top: 0;
+}
+
+.Body-content {
+    width: 50%;
+    height: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    align-items: center;
+    justify-content: center;
+    background-color: #bababa;
+    background-size: cover;
+}
+
+.Header-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 1% 0 1% 0;
+}
+
+.Connect-btn {
+    position: absolute;
+    right: 0px;
+    margin-right: 5%;
+}
+
+.Main-btn {
+    margin-top: 10%;
+}
+
+.Random-amount {
+    margin-top: 5%;
+    font-size: 24px;
+    font-weight: bold;
+    color: firebrick;
+}
+
+.Amount-text {
+    margin-top: 5%;
+    font-size: 32px;
+    font-weight: bold;
+}
