@@ -54,12 +54,13 @@
 .Body-content {
     width: 50%;
     height: 500px;
+    display: flex;
+    flex-direction: column;
     margin-left: auto;
     margin-right: auto;
     align-items: center;
     justify-content: center;
     background-color: #bababa;
-    background-size: cover;
 }
 
 .Header-title {
@@ -74,19 +75,25 @@
     margin-right: 5%;
 }
 
-.Main-btn {
-    margin-top: 10%;
+.Next-time-text {
+    font-size: 24px;
+    font-weight: bold;
+    color: #444;
 }
 
 .Random-amount {
-    margin-top: 5%;
     font-size: 24px;
     font-weight: bold;
     color: firebrick;
 }
 
 .Amount-text {
-    margin-top: 5%;
     font-size: 32px;
     font-weight: bold;
+}
+
+.Claim-time {
+    font-size: 16px;
+    font-weight: bold;
+    color: firebrick;
 }

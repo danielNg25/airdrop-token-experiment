@@ -1,48 +1,97 @@
-import React from 'react'
-import { Button } from 'react-bootstrap'
-import 'bootstrap/dist/css/bootstrap.css';
-import { useState } from 'react';
-import { ethers } from 'ethers';
+import React from "react";
+import { Button } from "react-bootstrap";
+import "bootstrap/dist/css/bootstrap.css";
+import { ethers } from "ethers";
+import { useSelector, useDispatch } from "react-redux";
+import {
+    addressSelector,
+    signerSelector,
+    tokenSelector,
+    setAddress,
+    setSigner,
+    setToken,
+} from "../app/reducer/authSlice";
+
+import axios from "axios";
 export default function Header() {
+    const address = useSelector(addressSelector);
+    const signer = useSelector(signerSelector);
+    const token = useSelector(tokenSelector);
 
+    const dispatch = useDispatch();
 
-  const [walletAddress, setWalletAddress] = useState("");
-  const [provider, setProvider] = useState("");
-  async function requestAccount() {
-    console.log('Requesting account...');
-    if(window.ethereum) {
-      console.log('detected');
+    const hanldeCreateUser = async (userAddress) => {
+        try {
+            const response = await axios.post("/auth/register", {
+                address: userAddress,
+            });
+        } catch (err) {
+            console.log(err.response);
+            return;
+        }
+    };
 
-      try {
-        const accounts = await window.ethereum.request({
-          method: "eth_requestAccounts",
-        });
-        setWalletAddress(accounts[0]);
-        console.log(accounts[0]);
-      } catch (error) {
-        console.log('Error connecting...');
-      }
+    const handleAuthenticate = async (userAddress, signature) => {
+        try {
+            const response = await axios.post("/auth/authenticate", {
+                address: userAddress,
+                signature: signature,
+            });
+            return response.data.accessToken;
+        } catch (err) {
+            console.log(err.response);
+            return;
+        }
+    };
 
-    } else {
-      alert('Meta Mask not detected');
-    }
-  }
+    const handleSignMessage = async (etherSigner, nonce) => {
+        const signature = await etherSigner.signMessage("Register to Truong's airdrop with nonce: " + nonce);
+        return signature;
+    };
 
-  // Create a provider to interact with a smart contract
-  async function connectWallet() {
-    if(typeof window.ethereum !== 'undefined') {
-      await requestAccount();
-      const ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
-      await ethersProvider.send("eth_requestAccounts", []);
-      const signer = ethersProvider.getSigner();
-      setProvider(ethersProvider);
-      console.log(signer);
-    }
-  }
-  return (
-    <div className='Header'>
-        <div className='Header-title '>AIR DROP</div>
-        <Button variant="danger" className='Connect-btn' onClick={connectWallet}>Connect</Button>
-    </div>
-  )
+    const handleOnclickConnect = async () => {
+        if (typeof window.ethereum == "undefined") {
+            console.log("MetaMask is not installed!");
+            return;
+        }
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const accounts = await provider.send("eth_requestAccounts", []);
+        
+        const account = accounts[0];
+        dispatch(setAddress(accounts[0]));
+        const ethersSigner = provider.getSigner();
+        dispatch(setAddress(account));
+        dispatch(setSigner(ethersSigner));
+        console.log(account);
+        try {
+            const response = await axios.post("/auth/get-nonce", {
+                address: account,
+            });
+            const signature = await handleSignMessage(ethersSigner, response.data.nonce);
+            const accessToken = await handleAuthenticate(account, signature);
+            if(accessToken){
+              dispatch(setToken(accessToken));
+            }else{
+              console.log("Invalid Signature!")
+            }
+        } catch (err) {
+            console.log(err.response);
+            if (err.response.status == 406) {
+                await hanldeCreateUser(account);
+            }
+        }
+    };
+
+    return (
+        <div className="Header">
+            <div className="Header-title ">AIR DROP</div>
+            {token == null ? (
+                <Button variant="danger" className="Connect-btn" onClick={handleOnclickConnect}>
+                    Connect
+                </Button>
+            ) : (
+                <div className="Connect-btn">{address.slice(0, 5) + "..." + address.slice(38, 42)}</div>
+            )}
+        </div>
+    );
 }
