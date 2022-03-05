@@ -6,7 +6,6 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.css";
 export default function Register() {
     const address = useSelector(addressSelector);
-    const signer = useSelector(signerSelector);
     const token = useSelector(tokenSelector);
     const dispatch = useDispatch();
     const DAY_UNIX = 86400;

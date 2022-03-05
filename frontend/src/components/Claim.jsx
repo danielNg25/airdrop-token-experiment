@@ -11,19 +11,39 @@ export default function Claim() {
     const dispatch = useDispatch();
     const [currentAmount, setCurrentAmount] = useState(0);
     useEffect(() => {
-      const getCurrentAmount = async () => {
-          try {
-              const response = await axios.get("/amount/" + address);
-              setCurrentAmount(response.data.amount);
-          } catch (err) {
-              console.log(err.response.data);
-          }
-      };
-      getCurrentAmount();
-  }, [token]);
+        const getCurrentAmount = async () => {
+            try {
+                const response = await axios.get("/amount/" + address);
+                setCurrentAmount(response.data.amount);
+            } catch (err) {
+                console.log(err.response.data);
+            }
+        };
+        getCurrentAmount();
+    }, [token]);
+
+    const handleClaim = async () => {
+        try {
+            const response = await axios.post(
+                "/amount/claim",
+                {
+                    address: address,
+                },
+                {
+                    headers: {
+                        "x-access-token": token,
+                    },
+                }
+            );
+            console.log(response.data)
+        } catch (err) {
+            console.log(err.response.data);
+        }
+    };
+
     return (
         <div className="Body-content">
-            <Button className="Main-btn" variant="success">
+            <Button className="Main-btn" variant="success" onClick={handleClaim}>
                 Claim
             </Button>
             <div className="Amount-text">Your current amount: {currentAmount} NDT</div>
