@@ -20,6 +20,11 @@ const UserSchema = new mongoose.Schema({
         lastTime: {
             type: Number,
             required: true
+        },
+        isClaimed: {
+            type: Boolean,
+            required: true,
+            default: false
         }
     },
     opts);

@@ -49,4 +49,50 @@ router.put("/", async(req, res) => {
 
     }
 })
+
+router.post("/claim", async(req, res) => {
+    try {
+        const token = req.headers['x-access-token'].trim();
+        let userAddress;
+        jwt.verify(token, process.env.JWT_TOKEN, (err, decoded) => {
+            if (err) {
+                throw ("Invalid Token");
+            } else {
+                userAddress = decoded.address;
+            }
+        });
+        const user = await User.findOne({ address: userAddress.toLowerCase() });
+        const wallet = new ethers.Wallet(process.env.PRIVATE_KEY);
+        const signature = await wallet._signTypedData(
+            // Domain
+            {
+                name: "Truong's AirDrop",
+                version: "1",
+                chainId: "97",
+                verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC'
+            },
+            // Types
+            {
+                Token: [
+                    { name: "amount", type: "uint256" },
+                    { name: "account", type: "address" }
+                ],
+            },
+            // Values
+            {
+                amount: user.amount,
+                account: user.address
+            }
+        )
+        res.status(200).json(signature);
+    } catch (err) {
+        if (err == "Invalid Token") {
+            res.status(401).json(err);
+        } else {
+            res.status(500).json(err);
+        }
+    }
+
+
+})
 module.exports = router;
