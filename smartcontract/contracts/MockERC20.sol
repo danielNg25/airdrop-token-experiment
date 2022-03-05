@@ -7,7 +7,7 @@ contract MockERC20 is ERC20Burnable {
 
     constructor(
     ) ERC20("Truong's Coin", "NDT") {
-        decimals_ = 18;
+        decimals_ = 0;
         uint256 totalTokens = 100000000 * 10**uint256(decimals());
         _mint(msg.sender, totalTokens);
     }

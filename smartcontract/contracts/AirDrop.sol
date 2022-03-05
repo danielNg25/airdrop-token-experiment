@@ -55,7 +55,7 @@ contract AirDrop is EIP712, AccessControl {
     internal view returns (bytes32)
     {
         return _hashTypedDataV4(keccak256(abi.encode(
-            keccak256("Truong's AirDrop(uint256 amount,address account)"),
+            keccak256("TruongsAirDrop(uint256 tokenId,address account)"),
             _amount,
             _account
         )));

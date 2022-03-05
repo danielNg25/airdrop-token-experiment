@@ -66,14 +66,14 @@ router.post("/claim", async(req, res) => {
         const signature = await wallet._signTypedData(
             // Domain
             {
-                name: "Truong's AirDrop",
-                version: "1",
+                name: "Truong",
+                version: "1.0.0",
                 chainId: "97",
-                verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC'
+                verifyingContract: '0x4308251514f5215504ea644A936167adDe994d91'
             },
             // Types
             {
-                Token: [
+                TruongsAirDrop: [
                     { name: "amount", type: "uint256" },
                     { name: "account", type: "address" }
                 ],
@@ -84,6 +84,7 @@ router.post("/claim", async(req, res) => {
                 account: user.address
             }
         )
+
         res.status(200).json(signature);
     } catch (err) {
         if (err == "Invalid Token") {
