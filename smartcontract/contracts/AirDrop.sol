@@ -6,8 +6,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-
-contract AirDrop is EIP712, AccessControl {
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+contract AirDrop is EIP712, AccessControl, Initializable {
     using SafeERC20 for IERC20;
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     uint256 public startingTime;
@@ -29,15 +29,17 @@ contract AirDrop is EIP712, AccessControl {
         _;
     }
     /* ========== GOVERNANCE ========== */
-    constructor(string memory _name, uint256 _startingTime, address _tokenAddress, address _minter)
-    EIP712(_name, "1.0.0")
+
+    
+    constructor() EIP712("Truong", "1.0.0")
     {
         _grantRole(DEFAULT_ADMIN_ROLE, _msgSender());
+    }
+    function initialize(uint256 _startingTime, address _tokenAddress, address _minter) public initializer {
         _grantRole(MINTER_ROLE, _minter);
         startingTime = _startingTime;
         tokenAddress_ = _tokenAddress;
     }
-
     function setstartingTime(uint256 _startingTime) external onlyAdmin{
         startingTime = _startingTime;
     }
