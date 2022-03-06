@@ -1,5 +1,11 @@
+## How to install
+
+```
+npm install
+```
+
 ## How to start
 
 ```
-yarn start
+npm start
 ```
