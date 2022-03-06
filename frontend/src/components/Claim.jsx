@@ -6,7 +6,7 @@ import axios from "axios";
 import { ethers } from "ethers";
 import "bootstrap/dist/css/bootstrap.css";
 import AIRDROP from "../abi/AirDrop.json";
-import { TOKEN_CONTRACT_ADDRESS, TOKEN_SYMBOL } from "../const";
+import { AIRDROP_CONTRACT_ADDRESS, TOKEN_SYMBOL,TOKEN_CONTRACT_ADDRESS, DECIMAL } from "../const";
 export default function Claim() {
     const address = useSelector(addressSelector);
     const signer = useSelector(signerSelector);
@@ -29,7 +29,7 @@ export default function Claim() {
         getCurrentAmount();
 
         const airDropWatchContract = new ethers.Contract(
-            TOKEN_CONTRACT_ADDRESS,
+            AIRDROP_CONTRACT_ADDRESS,
             AIRDROP,
             provider
         );
@@ -69,7 +69,7 @@ export default function Claim() {
                     },
                 }
             );
-            const airDropContract = new ethers.Contract(TOKEN_CONTRACT_ADDRESS, AIRDROP, signer);
+            const airDropContract = new ethers.Contract(AIRDROP_CONTRACT_ADDRESS, AIRDROP, signer);
             const res = await airDropContract.claim(address, currentAmount, responsePost.data);
             if (res) {
                 
@@ -81,13 +81,43 @@ export default function Claim() {
             
         }
     };
-
+    const handleAddTokenToWallet = async() => {
+        try {
+            
+            const wasAdded = await window.ethereum.request({
+              method: 'wallet_watchAsset',
+              params: {
+                type: 'ERC20', 
+                options: {
+                  address: TOKEN_CONTRACT_ADDRESS, 
+                  symbol: TOKEN_SYMBOL, 
+                  decimals: DECIMAL, 
+                  image: "", 
+                },
+              },
+            });
+          
+            if (wasAdded) {
+              console.log('Thanks for your interest!');
+            } else {
+              console.log('Your loss!');
+            }
+          } catch (error) {
+            console.log(error);
+          }
+    }
+    const handleClickTokenAddress = ()=>{
+        window.open("https://testnet.bscscan.com/token/" + TOKEN_CONTRACT_ADDRESS, '_blank').focus();
+    }
     return (
         <div className="Body-content">
             {isClaimed ? (
-                <Button className="Main-btn" variant="secondary" disabled>
-                    Claimed
+                <>
+                <Button className="Main-btn" variant="success" onClick={handleAddTokenToWallet}>
+                    Add To Wallet
                 </Button>
+                <div className="Amount-text">You have claimed: <span className="color-blue cursor-pointer" onClick={handleClickTokenAddress}>{currentAmount} {TOKEN_SYMBOL}</span></div>
+                </>
             ) : (
                 <>
                     {isProcessing ? (
@@ -99,10 +129,11 @@ export default function Claim() {
                             Claim
                         </Button>
                     )}
+                    <div className="Amount-text">Click Claim to get: <span className="color-blue cursor-pointer" onClick={handleClickTokenAddress}>{currentAmount} {TOKEN_SYMBOL}</span></div>
                 </>
             )}
 
-            <div className="Amount-text">Your current amount: {currentAmount} {TOKEN_SYMBOL}</div>
+            
         </div>
     );
 }

@@ -3,7 +3,7 @@ import { Button } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { addressSelector, tokenSelector } from "../app/reducer/authSlice";
 import axios from "axios";
-import { TOKEN_SYMBOL, DAY_UNIX, STARTING_DAY } from "../const";
+import { TOKEN_SYMBOL, DAY_UNIX, STARTING_DAY, TOKEN_CONTRACT_ADDRESS } from "../const";
 import { convertUnixTimeToHuman, convertToUnixTime } from "../utils.ts";
 import "bootstrap/dist/css/bootstrap.css";
 export default function Register() {
@@ -27,7 +27,7 @@ export default function Register() {
                 console.log(err.response.data);
             }
         };
-        
+
         getCurrentAmount();
     }, [token]);
 
@@ -58,25 +58,34 @@ export default function Register() {
             }
         }
     };
-
-
+    const handleClickTokenAddress = ()=>{
+        window.open("https://testnet.bscscan.com/token/" + TOKEN_CONTRACT_ADDRESS, '_blank').focus();
+    }
     return (
         <div className="Body-content">
-            {canRegister ? (
-                <>
-                    <Button className="Main-btn" variant="success" onClick={handleRegister}>
-                        Register
-                    </Button>
-                    <div className="Random-amount">Click to register to Airdrop (Random 1-100)!</div>
-                </>
-            ) : (
-                <div className="Next-time-text">Next time at: {convertUnixTimeToHuman(nextTime)}</div>
-            )}
-            {tokenToAdd != 0 && <div className="Random-amount">{tokenToAdd} {TOKEN_SYMBOL} have added to your account!</div>}
+            <div className="flex-9"> 
+                {canRegister ? (
+                    <>
+                        <Button className="Main-btn" variant="success" onClick={handleRegister}>
+                            Register
+                        </Button>
+                        <div className="Random-amount">Click to register to Airdrop (Random 1-100)!</div>
+                    </>
+                ) : (
+                    <div className="Next-time-text">Comeback at: <span className="color-firebrick">{convertUnixTimeToHuman(nextTime)}</span> to Register</div>
+                )}
+                {tokenToAdd != 0 && (
+                    <div className="Random-amount">
+                        {tokenToAdd} {TOKEN_SYMBOL} have added to your account!
+                    </div>
+                )}
 
-            <div className="Amount-text">Your current amount: {currentAmount} {TOKEN_SYMBOL}</div>
+                <div className="Amount-text">
+                    Your current amount: <span className="color-blue cursor-pointer" onClick={handleClickTokenAddress}>{currentAmount} {TOKEN_SYMBOL}</span> 
+                </div>
+            </div>
 
-            <div className="Claim-time">Tokens can be claimed at {convertUnixTimeToHuman(STARTING_DAY)}</div>
+            <div className="Claim-time flex-1">Tokens can be claimed at {convertUnixTimeToHuman(STARTING_DAY)}</div>
         </div>
     );
 }

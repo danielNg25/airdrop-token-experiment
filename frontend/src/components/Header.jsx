@@ -88,7 +88,9 @@ export default function Header() {
         }
     };
 
-   
+    const handleClickAddress = ()=>{
+        window.open("https://testnet.bscscan.com/address/" + address, '_blank').focus();
+    }
     return (
         <div className="Header">
             <div className="Header-title ">AIR DROP</div>
@@ -97,7 +99,7 @@ export default function Header() {
                     Connect
                 </Button>
             ) : (
-                <div className="Connect-btn">{address.slice(0, 5) + "..." + address.slice(38, 42)}</div>
+                <div className="Connect-btn color-tomato cursor-pointer" onClick={handleClickAddress}>{address.slice(0, 5) + "..." + address.slice(38, 42)}</div>
             )}
         </div>
     );

@@ -21,7 +21,7 @@ function App() {
                             {token ? (
                                 <>{convertToUnixTime(Date.now()) > STARTING_DAY ? <Claim /> : <Register />}</>
                             ) : (
-                                <div> Connect Metamask first </div>
+                                <div className="margin-top-5percent Random-amount"> Connect Metamask first </div>
                             )}
                         </div>
                     }
