@@ -32,8 +32,9 @@ router.put("/", async(req, res) => {
         });
         const user = await User.findOne({ address: userAddress.toLowerCase() });
         console.log(Math.floor(user.lastTime));
-
-        if (Math.floor(Date.now() / 1000) - user.lastTime > CONST_VALUE.DAY_UNIX) {
+        if (Math.floor(Date.now() / 1000) - CONST_VALUE.STARTING_TIME > 0) {
+            throw ("Register time is over")
+        } else if (Math.floor(Date.now() / 1000) - user.lastTime > CONST_VALUE.DAY_UNIX) {
             updateAmount = user.amount + req.body.amount;
             const updatedUser = await User.findByIdAndUpdate(
                 user._id, {
@@ -47,6 +48,8 @@ router.put("/", async(req, res) => {
     } catch (err) {
         if (err == "Invalid Token") {
             res.status(401).json(err);
+        } else if (err == "Register time is over") {
+            res.status(406).json(err);
         } else {
             res.status(500).json(err);
         }
