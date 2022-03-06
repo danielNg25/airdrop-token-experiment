@@ -5,17 +5,16 @@ import { ethers } from "ethers";
 import { useSelector, useDispatch } from "react-redux";
 import {
     addressSelector,
-    signerSelector,
     tokenSelector,
     setAddress,
     setSigner,
     setToken,
+    setProvider
 } from "../app/reducer/authSlice";
 
 import axios from "axios";
 export default function Header() {
     const address = useSelector(addressSelector);
-    const signer = useSelector(signerSelector);
     const token = useSelector(tokenSelector);
 
     const dispatch = useDispatch();
@@ -62,6 +61,7 @@ export default function Header() {
         const ethersSigner = provider.getSigner();
         dispatch(setAddress(account));
         dispatch(setSigner(ethersSigner));
+        dispatch(setProvider(provider));
         console.log(account);
         try {
             const response = await axios.post("/auth/get-nonce", {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { addressSelector, signerSelector, tokenSelector } from "../app/reducer/authSlice";
+import { addressSelector, signerSelector, tokenSelector, providerSelector } from "../app/reducer/authSlice";
 import { Button } from "react-bootstrap";
 import axios from "axios";
 import { ethers } from "ethers";
@@ -10,6 +10,7 @@ export default function Claim() {
     const address = useSelector(addressSelector);
     const signer = useSelector(signerSelector);
     const token = useSelector(tokenSelector);
+    const provider = useSelector(providerSelector);
     const dispatch = useDispatch();
     const [currentAmount, setCurrentAmount] = useState(0);
     const [isClaimed, setIsClaimed] = useState(0);
@@ -25,6 +26,10 @@ export default function Claim() {
             }
         };
         getCurrentAmount();
+        const airDropWatchContract = new ethers.Contract("0x4308251514f5215504ea644A936167adDe994d91", AIRDROP, provider);
+        airDropWatchContract.on("Claim", (amount, address) => {
+            console.log({amount, address})
+        })
     }, [token]);
 
     const handleClaim = async () => {
