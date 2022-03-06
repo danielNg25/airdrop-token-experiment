@@ -10,27 +10,38 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 contract AirDrop is EIP712, AccessControl {
     using SafeERC20 for IERC20;
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-    uint256 public closingTime;
+    uint256 public startingTime;
+    uint256 public receiverCount;
     address private tokenAddress_;
+    mapping (uint256 => address) private receivers;
+    mapping (address => uint256) private receiveAmount;
 
+    /* ========== EVENTS ========== */
+    event Claim(address account,uint256 amount);
+
+    /* ========== MODIFIERS ========== */
+    modifier onlyAdmin(){
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Only Admin");
+        _;
+    }
+    modifier isNotReceiver(){
+        require(receiveAmount[msg.sender] == 0);
+        _;
+    }
     /* ========== GOVERNANCE ========== */
-    constructor(string memory _name, uint256 _closingTime, address _tokenAddress, address _minter)
+    constructor(string memory _name, uint256 _startingTime, address _tokenAddress, address _minter)
     EIP712(_name, "1.0.0")
     {
         _grantRole(DEFAULT_ADMIN_ROLE, _msgSender());
         _grantRole(MINTER_ROLE, _minter);
-        closingTime = _closingTime;
+        startingTime = _startingTime;
         tokenAddress_ = _tokenAddress;
     }
 
-    
-
-    function setClosingTime(uint256 _closingTime) external {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender));
-        closingTime = _closingTime;
+    function setstartingTime(uint256 _startingTime) external onlyAdmin{
+        startingTime = _startingTime;
     }
-     function setTokenAddress(address _tokenAddress) external {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender));
+    function setTokenAddress(address _tokenAddress) external onlyAdmin{
         tokenAddress_ = _tokenAddress;
     }
 
@@ -38,17 +49,26 @@ contract AirDrop is EIP712, AccessControl {
     function tokenAddress() external view returns (address) {
         return tokenAddress_;
     }
-
+    function receiverByIndex(uint256 index) external view returns(address){
+        return receivers[index];
+    }
+    function amountHasReceived(address account) external view returns(uint256){
+        return receiveAmount[account];
+    }
     /* ========== MUTATIVE FUNCTIONS ========== */
-    function redeem(address _account, uint256 _amount, bytes calldata _signature)
-    external
+    function claim(address _account, uint256 _amount, bytes calldata _signature)
+    external isNotReceiver
     {
-        require(block.timestamp >= closingTime, "Too early");
+        require(block.timestamp >= startingTime, "Too early");
         require(_verify(_hash(_account, _amount), _signature), "Invalid signature");
+        receiverCount += 1;
+        receivers[receiverCount] = msg.sender;
+        receiveAmount[msg.sender] = _amount;
         IERC20(tokenAddress_).safeTransfer(
             _account,
             _amount
         );
+        emit Claim(_account, _amount);
     }
 
     function _hash(address _account, uint256 _amount)
@@ -70,11 +90,10 @@ contract AirDrop is EIP712, AccessControl {
     /* ========== EMERGENCY ========== */
     receive() external payable {}
 
-    function rescueStuckErc20(address _token) external  {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender));
+    function rescueStuckErc20(address _token) external onlyAdmin {
         require(
-            block.timestamp >= closingTime + 14 days,
-            "only can withdraw token at least 14 days after closing time"
+            block.timestamp >= startingTime + 14 days,
+            "only can withdraw token at least 14 days after starting time"
         );
         IERC20(_token).safeTransfer(
             msg.sender,
@@ -82,11 +101,10 @@ contract AirDrop is EIP712, AccessControl {
         );
     }
 
-    function rescueStuckBnb() external {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender));
+    function rescueStuckBnb() external onlyAdmin {
         require(
-            block.timestamp >= closingTime + 14 days,
-            "only can withdraw BNB at least 14 days after closing time"
+            block.timestamp >= startingTime + 14 days,
+            "only can withdraw BNB at least 14 days after starting time"
         );
         (bool sent, ) = msg.sender.call{value: address(this).balance}("");
         require(sent, "Failed to withdraw BNB left");
