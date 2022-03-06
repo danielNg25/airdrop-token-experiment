@@ -25,7 +25,7 @@ contract AirDrop is EIP712, AccessControl {
         _;
     }
     modifier isNotReceiver(){
-        require(receiveAmount[msg.sender] == 0);
+        require(receiveAmount[msg.sender] == 0, "You have received this Air Drop");
         _;
     }
     /* ========== GOVERNANCE ========== */
