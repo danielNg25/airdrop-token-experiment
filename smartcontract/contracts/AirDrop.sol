@@ -61,6 +61,7 @@ contract AirDrop is EIP712, AccessControl {
     {
         require(block.timestamp >= startingTime, "Too early");
         require(_verify(_hash(_account, _amount), _signature), "Invalid signature");
+        require(IERC20(tokenAddress_).balanceOf(address(this)) >= _amount, "Out of token");
         receiverCount += 1;
         receivers[receiverCount] = msg.sender;
         receiveAmount[msg.sender] = _amount;
@@ -75,7 +76,7 @@ contract AirDrop is EIP712, AccessControl {
     internal view returns (bytes32)
     {
         return _hashTypedDataV4(keccak256(abi.encode(
-            keccak256("TruongsAirDrop(uint256 tokenId,address account)"),
+            keccak256("TruongsAirDrop(uint256 amount,address account)"),
             _amount,
             _account
         )));
