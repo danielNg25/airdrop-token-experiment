@@ -6,7 +6,7 @@
             },
             {
                 "internalType": "uint256",
-                "name": "_closingTime",
+                "name": "_startingTime",
                 "type": "uint256"
             },
             {
@@ -22,6 +22,24 @@
         ],
         "stateMutability": "nonpayable",
         "type": "constructor"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{
+                "indexed": false,
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "Claim",
+        "type": "event"
     },
     {
         "anonymous": false,
@@ -118,14 +136,40 @@
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "closingTime",
+        "inputs": [{
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
+        }],
+        "name": "amountHasReceived",
         "outputs": [{
             "internalType": "uint256",
             "name": "",
             "type": "uint256"
         }],
         "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+                "internalType": "address",
+                "name": "_account",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_amount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bytes",
+                "name": "_signature",
+                "type": "bytes"
+            }
+        ],
+        "name": "claim",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
@@ -183,22 +227,11 @@
     },
     {
         "inputs": [{
-                "internalType": "address",
-                "name": "_account",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_amount",
-                "type": "uint256"
-            },
-            {
-                "internalType": "bytes",
-                "name": "_signature",
-                "type": "bytes"
-            }
-        ],
-        "name": "recover",
+            "internalType": "uint256",
+            "name": "index",
+            "type": "uint256"
+        }],
+        "name": "receiverByIndex",
         "outputs": [{
             "internalType": "address",
             "name": "",
@@ -208,25 +241,14 @@
         "type": "function"
     },
     {
-        "inputs": [{
-                "internalType": "address",
-                "name": "_account",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_amount",
-                "type": "uint256"
-            },
-            {
-                "internalType": "bytes",
-                "name": "_signature",
-                "type": "bytes"
-            }
-        ],
-        "name": "redeem",
-        "outputs": [],
-        "stateMutability": "nonpayable",
+        "inputs": [],
+        "name": "receiverCount",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -283,17 +305,6 @@
     },
     {
         "inputs": [{
-            "internalType": "uint256",
-            "name": "_closingTime",
-            "type": "uint256"
-        }],
-        "name": "setClosingTime",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [{
             "internalType": "address",
             "name": "_tokenAddress",
             "type": "address"
@@ -301,6 +312,28 @@
         "name": "setTokenAddress",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "uint256",
+            "name": "_startingTime",
+            "type": "uint256"
+        }],
+        "name": "setstartingTime",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "startingTime",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "stateMutability": "view",
         "type": "function"
     },
     {

@@ -13,7 +13,8 @@ export default function Claim() {
     const provider = useSelector(providerSelector);
     const dispatch = useDispatch();
     const [currentAmount, setCurrentAmount] = useState(0);
-    const [isClaimed, setIsClaimed] = useState(0);
+    const [isClaimed, setIsClaimed] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
     useEffect(() => {
         const getCurrentAmount = async () => {
             try {
@@ -26,13 +27,36 @@ export default function Claim() {
             }
         };
         getCurrentAmount();
-        const airDropWatchContract = new ethers.Contract("0x4308251514f5215504ea644A936167adDe994d91", AIRDROP, provider);
-        airDropWatchContract.on("Claim", (amount, address) => {
-            console.log({amount, address})
-        })
-    }, [token]);
 
+        const airDropWatchContract = new ethers.Contract(
+            "0x7A664ab10679F9B3C90B5F02383c597424CaD6eB",
+            AIRDROP,
+            provider
+        );
+        airDropWatchContract.on("Claim", (returnedAddress, amount) => {
+            if (address.toLowerCase() == returnedAddress.toString().toLowerCase()) {
+                setIsClaimed(true);
+            }
+        });
+    }, [token]);
+    useEffect(() => {
+        const setClaimedToBE = async () => {
+            const responsePut = await axios.put(
+                "/amount/claim",
+                { address: address },
+                {
+                    headers: {
+                        "x-access-token": token,
+                    },
+                }
+            );
+        };
+        if (isClaimed) {
+            setClaimedToBE();
+        }
+    }, [isClaimed]);
     const handleClaim = async () => {
+        setIsProcessing(true);
         try {
             const responsePost = await axios.post(
                 "/amount/claim",
@@ -46,20 +70,13 @@ export default function Claim() {
                 }
             );
             console.log(responsePost.data);
-            const airDropContract = new ethers.Contract("0x4308251514f5215504ea644A936167adDe994d91", AIRDROP, signer);
-            const res = await airDropContract.redeem(address, currentAmount, responsePost.data);
+            const airDropContract = new ethers.Contract("0x7A664ab10679F9B3C90B5F02383c597424CaD6eB", AIRDROP, signer);
+            const res = await airDropContract.claim(address, currentAmount, responsePost.data);
             if (res) {
-                const responsePut = await axios.put(
-                    "/amount/claim",
-                    { address: address },
-                    {
-                        headers: {
-                            "x-access-token": token,
-                        },
-                    }
-                );
+                
             }
         } catch (err) {
+            setIsProcessing(false);
             console.log(err);
             alert(err.response.data);
         }
@@ -72,9 +89,17 @@ export default function Claim() {
                     Claimed
                 </Button>
             ) : (
-                <Button className="Main-btn" variant="success" onClick={handleClaim}>
-                    Claim
-                </Button>
+                <>
+                    {isProcessing ? (
+                        <Button className="Main-btn" variant="secondary" disabled>
+                            Processing
+                        </Button>
+                    ) : (
+                        <Button className="Main-btn" variant="success" onClick={handleClaim}>
+                            Claim
+                        </Button>
+                    )}
+                </>
             )}
 
             <div className="Amount-text">Your current amount: {currentAmount} NDT</div>
