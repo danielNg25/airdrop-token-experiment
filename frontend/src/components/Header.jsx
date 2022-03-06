@@ -5,17 +5,16 @@ import { ethers } from "ethers";
 import { useSelector, useDispatch } from "react-redux";
 import {
     addressSelector,
-    signerSelector,
     tokenSelector,
     setAddress,
     setSigner,
     setToken,
+    setProvider
 } from "../app/reducer/authSlice";
 
 import axios from "axios";
 export default function Header() {
     const address = useSelector(addressSelector);
-    const signer = useSelector(signerSelector);
     const token = useSelector(tokenSelector);
 
     const dispatch = useDispatch();
@@ -62,11 +61,23 @@ export default function Header() {
         const ethersSigner = provider.getSigner();
         dispatch(setAddress(account));
         dispatch(setSigner(ethersSigner));
+        dispatch(setProvider(provider));
         console.log(account);
+        let response;
         try {
-            const response = await axios.post("/auth/get-nonce", {
+            response = await axios.post("/auth/get-nonce", {
                 address: account,
             });
+            
+        } catch (err) {
+            console.log(err.response);
+            if (err.response.status == 406) {
+                await hanldeCreateUser(account);
+                response = await axios.post("/auth/get-nonce", {
+                    address: account,
+                });
+            }
+        }finally{
             const signature = await handleSignMessage(ethersSigner, response.data.nonce);
             const accessToken = await handleAuthenticate(account, signature);
             if(accessToken){
@@ -74,14 +85,12 @@ export default function Header() {
             }else{
               console.log("Invalid Signature!")
             }
-        } catch (err) {
-            console.log(err.response);
-            if (err.response.status == 406) {
-                await hanldeCreateUser(account);
-            }
         }
     };
 
+    const handleClickAddress = ()=>{
+        window.open("https://testnet.bscscan.com/address/" + address, '_blank').focus();
+    }
     return (
         <div className="Header">
             <div className="Header-title ">AIR DROP</div>
@@ -90,7 +99,7 @@ export default function Header() {
                     Connect
                 </Button>
             ) : (
-                <div className="Connect-btn">{address.slice(0, 5) + "..." + address.slice(38, 42)}</div>
+                <div className="Connect-btn color-tomato cursor-pointer" onClick={handleClickAddress}>{address.slice(0, 5) + "..." + address.slice(38, 42)}</div>
             )}
         </div>
     );

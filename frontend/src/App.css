@@ -60,7 +60,7 @@
     margin-right: auto;
     align-items: center;
     justify-content: center;
-    background-color: #bababa;
+    background-color: #ebebeb;
 }
 
 .Header-title {
@@ -87,6 +87,18 @@
     color: firebrick;
 }
 
+.color-firebrick {
+    color: firebrick;
+}
+
+.color-tomato {
+    color: tomato;
+}
+
+.color-blue {
+    color: dodgerblue;
+}
+
 .Amount-text {
     font-size: 32px;
     font-weight: bold;
@@ -96,4 +108,26 @@
     font-size: 16px;
     font-weight: bold;
     color: firebrick;
+}
+
+.margin-top-5percent {
+    margin-top: 5%;
+}
+
+.flex-9 {
+    flex: 9;
+    display: flex;
+    flex-direction: column;
+    margin-left: auto;
+    margin-right: auto;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.cursor-pointer:hover {
+    cursor: pointer;
 }
