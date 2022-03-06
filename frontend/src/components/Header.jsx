@@ -3,14 +3,7 @@ import { Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.css";
 import { ethers } from "ethers";
 import { useSelector, useDispatch } from "react-redux";
-import {
-    addressSelector,
-    tokenSelector,
-    setAddress,
-    setSigner,
-    setToken,
-    setProvider
-} from "../app/reducer/authSlice";
+import { addressSelector, tokenSelector, setAddress, setSigner, setToken, setProvider } from "../app/reducer/authSlice";
 
 import axios from "axios";
 export default function Header() {
@@ -55,7 +48,7 @@ export default function Header() {
         }
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const accounts = await provider.send("eth_requestAccounts", []);
-        
+
         const account = accounts[0];
         dispatch(setAddress(accounts[0]));
         const ethersSigner = provider.getSigner();
@@ -68,7 +61,6 @@ export default function Header() {
             response = await axios.post("/auth/get-nonce", {
                 address: account,
             });
-            
         } catch (err) {
             console.log(err.response);
             if (err.response.status == 406) {
@@ -77,19 +69,25 @@ export default function Header() {
                     address: account,
                 });
             }
-        }finally{
+        } finally {
             const signature = await handleSignMessage(ethersSigner, response.data.nonce);
             const accessToken = await handleAuthenticate(account, signature);
-            if(accessToken){
-              dispatch(setToken(accessToken));
-            }else{
-              console.log("Invalid Signature!")
+            if (accessToken) {
+                dispatch(setToken(accessToken));
+            } else {
+                console.log("Invalid Signature!");
             }
         }
     };
 
-    const handleClickAddress = ()=>{
-        window.open("https://testnet.bscscan.com/address/" + address, '_blank').focus();
+    const handleClickAddress = () => {
+        window.open("https://testnet.bscscan.com/address/" + address, "_blank").focus();
+    };
+    const handleLogOut = () => {
+        dispatch(setAddress(null));
+        dispatch(setSigner(null));
+        dispatch(setProvider(null));
+        dispatch(setToken(null));
     }
     return (
         <div className="Header">
@@ -99,7 +97,14 @@ export default function Header() {
                     Connect
                 </Button>
             ) : (
-                <div className="Connect-btn color-tomato cursor-pointer" onClick={handleClickAddress}>{address.slice(0, 5) + "..." + address.slice(38, 42)}</div>
+                <div className="Account-control">
+                    <div className="color-tomato cursor-pointer " onClick={handleClickAddress}>
+                        {address.slice(0, 5) + "..." + address.slice(38, 42)}
+                    </div>
+                    <Button variant="danger " onClick={handleLogOut}>
+                        Log Out
+                    </Button>
+                </div>
             )}
         </div>
     );
