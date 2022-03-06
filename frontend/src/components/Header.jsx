@@ -63,10 +63,21 @@ export default function Header() {
         dispatch(setSigner(ethersSigner));
         dispatch(setProvider(provider));
         console.log(account);
+        let response;
         try {
-            const response = await axios.post("/auth/get-nonce", {
+            response = await axios.post("/auth/get-nonce", {
                 address: account,
             });
+            
+        } catch (err) {
+            console.log(err.response);
+            if (err.response.status == 406) {
+                await hanldeCreateUser(account);
+                response = await axios.post("/auth/get-nonce", {
+                    address: account,
+                });
+            }
+        }finally{
             const signature = await handleSignMessage(ethersSigner, response.data.nonce);
             const accessToken = await handleAuthenticate(account, signature);
             if(accessToken){
@@ -74,14 +85,10 @@ export default function Header() {
             }else{
               console.log("Invalid Signature!")
             }
-        } catch (err) {
-            console.log(err.response);
-            if (err.response.status == 406) {
-                await hanldeCreateUser(account);
-            }
         }
     };
 
+   
     return (
         <div className="Header">
             <div className="Header-title ">AIR DROP</div>

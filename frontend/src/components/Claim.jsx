@@ -6,6 +6,7 @@ import axios from "axios";
 import { ethers } from "ethers";
 import "bootstrap/dist/css/bootstrap.css";
 import AIRDROP from "../abi/AirDrop.json";
+import { TOKEN_CONTRACT_ADDRESS, TOKEN_SYMBOL } from "../const";
 export default function Claim() {
     const address = useSelector(addressSelector);
     const signer = useSelector(signerSelector);
@@ -21,7 +22,6 @@ export default function Claim() {
                 const response = await axios.get("/amount/" + address);
                 setCurrentAmount(response.data.amount);
                 setIsClaimed(response.data.isClaimed);
-                console.log(response.data.isClaimed);
             } catch (err) {
                 console.log(err.response.data);
             }
@@ -29,7 +29,7 @@ export default function Claim() {
         getCurrentAmount();
 
         const airDropWatchContract = new ethers.Contract(
-            "0x7A664ab10679F9B3C90B5F02383c597424CaD6eB",
+            TOKEN_CONTRACT_ADDRESS,
             AIRDROP,
             provider
         );
@@ -69,8 +69,7 @@ export default function Claim() {
                     },
                 }
             );
-            console.log(responsePost.data);
-            const airDropContract = new ethers.Contract("0x7A664ab10679F9B3C90B5F02383c597424CaD6eB", AIRDROP, signer);
+            const airDropContract = new ethers.Contract(TOKEN_CONTRACT_ADDRESS, AIRDROP, signer);
             const res = await airDropContract.claim(address, currentAmount, responsePost.data);
             if (res) {
                 
@@ -78,7 +77,8 @@ export default function Claim() {
         } catch (err) {
             setIsProcessing(false);
             console.log(err);
-            alert(err.response.data);
+            alert("Something went wrong! F12 to see err");
+            
         }
     };
 
@@ -102,7 +102,7 @@ export default function Claim() {
                 </>
             )}
 
-            <div className="Amount-text">Your current amount: {currentAmount} NDT</div>
+            <div className="Amount-text">Your current amount: {currentAmount} {TOKEN_SYMBOL}</div>
         </div>
     );
 }
