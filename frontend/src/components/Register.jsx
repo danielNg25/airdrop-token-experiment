@@ -32,20 +32,18 @@ export default function Register() {
     }, [token]);
 
     const handleRegister = async () => {
-        const randomTokenAmount = Math.floor(Math.random() * 100) + 1;
-        setTokenToAdd(randomTokenAmount);
+        
         try {
             const response = await axios.put(
                 "/amount",
-                {
-                    amount: randomTokenAmount,
-                },
+                {},
                 {
                     headers: {
                         "x-access-token": token,
                     },
                 }
             );
+            setTokenToAdd(response.data.addedAmount);
             setCurrentAmount(response.data.amount);
             const nextTimeRegister = response.data.lastTime + DAY_UNIX;
             setNextTime(nextTimeRegister);

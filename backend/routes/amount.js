@@ -35,13 +35,18 @@ router.put("/", async(req, res) => {
         if (Math.floor(Date.now() / 1000) - CONST_VALUE.STARTING_TIME > 0) {
             throw ("Register time is over")
         } else if (Math.floor(Date.now() / 1000) - user.lastTime > CONST_VALUE.DAY_UNIX) {
-            updateAmount = user.amount + req.body.amount;
+            const randomTokenAmount = Math.floor(Math.random() * 100) + 1;
+            updateAmount = user.amount + randomTokenAmount;
             const updatedUser = await User.findByIdAndUpdate(
                 user._id, {
                     $set: { amount: updateAmount, lastTime: Math.floor(Date.now() / 1000) },
                 }, { new: true }
             );
-            res.status(200).json(updatedUser);
+            res.status(200).json({
+                addedAmount: randomTokenAmount,
+                amount: updatedUser.amount,
+                lastTime: updatedUser.lastTime
+            });
         } else {
             res.status(406).json("It's not time to register yet!");
         }
